@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Embed of a community Garten of Banban project (opens in a new tab if embedding is blocked)." />
+  <meta name="robots" content="noindex" />
+  <title>Garten of Banban — Embed</title>
+
+  <style>
+    :root { --bg:#000; --fg:#fff; --muted:#888; --accent:#06f; }
+    html,body { height:100%; margin:0; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
+    .frame-wrap { position:relative; width:100%; height:100vh; }
+    iframe { width:100%; height:100%; border:0; display:block; background:#111; }
+    /* Loader centered */
+    .loader {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.2));
+      color:var(--fg); z-index:10;
+      flex-direction:column;
+      gap:0.6rem;
+    }
+    .spinner {
+      width:48px; height:48px; border-radius:50%;
+      border:4px solid rgba(255,255,255,0.12); border-top-color:var(--accent);
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .fallback {
+      text-align:center; color:var(--muted); font-size:0.95rem;
+      margin-top:0.3rem;
+    }
+    .open-btn {
+      display:inline-block; margin-top:0.6rem; padding:0.45rem 0.9rem;
+      background:var(--accent); color:#fff; border-radius:6px; text-decoration:none;
+    }
+  </style>
+</head>
+<body>
+  <main class="frame-wrap" role="main">
+    <div id="loader" class="loader" aria-hidden="false">
+      <div class="spinner" aria-hidden="true"></div>
+      <div>
+        Loading content…
+        <div class="fallback" id="statusText">If embedding is blocked, use the link below.</div>
+        <a id="openLink" class="open-btn" href="https://turbowarp.org" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+      </div>
+    </div>
+
+    <!-- Note on sandbox: adding sandbox increases security but may break the framed site.
+         If the framed site requires scripts/same-origin features, you may need to
+         relax the sandbox attributes — do so only if you understand the implications. -->
+    <iframe
+      id="contentFrame"
+      src="https://turbowarp.org"
+      title="Garten of Banban community project"
+      loading="lazy"
+      referrerpolicy="no-referrer"
+      allow="fullscreen; autoplay; clipboard-read; clipboard-write; picture-in-picture"
+      sandbox="allow-scripts allow-forms allow-popups allow-modals allow-same-origin"
+      aria-label="Embedded Garten of Banban community project">
+    </iframe>
+  </main>
+
+  <script>
+    (function () {
+      const iframe = document.getElementById('contentFrame');
+      const loader = document.getElementById('loader');
+      const statusText = document.getElementById('statusText');
+
+      // Hide loader when iframe reports loaded
+      iframe.addEventListener('load', () => {
+        // After load, the framed page may still be unreachable due to X-Frame-Options or CSP.
+        // We can't reliably detect cross-origin inner content, but if load fired, assume success.
+        loader.style.display = 'none';
+        loader.setAttribute('aria-hidden', 'true');
+      });
+
+      // Fallback: if iframe doesn't load within X seconds, update UI to show fallback link.
+      const timeoutMs = 7000;
+      const timeout = setTimeout(() => {
+        // If the iframe is blocked by X-Frame-Options or CSP, browsers often still fire load or not;
+        // when not, we update the UI so user can open content in a new tab.
+        statusText.textContent = 'Embedding may be blocked by the site or your network. Open it directly:';
+        // keep loader visible with fallback link
+      }, timeoutMs);
+    })();
+  </script>
+</body>
+</html>
